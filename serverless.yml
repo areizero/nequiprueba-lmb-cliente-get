@@ -1,0 +1,25 @@
+service: nequiprueba-lmb-cliente-get
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  environment:    
+    PATH_RESOURCES: /v1/clientes/get
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: arn:aws:dynamodb:us-east-1:124436490636:table/nequi-cliente
+
+functions:
+  getCliente:
+    handler: handler.get
+    events:
+      - http:
+          path: ${self:provider.environment.PATH_RESOURCES}
+          method: get
+          cors: true
+    memorySize: 128
