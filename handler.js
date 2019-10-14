@@ -52,7 +52,7 @@ const getClientesResponse = (clientes) => {
       apellido: item.apellido,
       ciudadNacimiento: item.ciudadNacimiento,
       edad: item.edad,
-      imagenPerfil: ""
+      imagenPerfil: item.imagenPerfil
     })
   })
   return clientesRs
