@@ -14,8 +14,22 @@ const headers = {
  */
 module.exports.get = async (event, context) => {
   try {
+    let queryParams = event.queryStringParameters
+    let pathParams = event.pathParameters
     let params = {
       TableName: 'nequi-cliente'
+    }
+    if(queryParams && queryParams.idTipo && queryParams.idNumero) {
+      params.ExpressionAttributeNames = { '#id': 'id'}
+      params.ExpressionAttributeValues = { ':id': `${queryParams.idTipo}-${queryParams.idNumero}`}
+      params.FilterExpression = "#id = :id"
+      let clientes = await scan(params)
+      return sendResponse(200, getClientesResponse(clientes)[0], headers)
+    }
+    if(queryParams && queryParams.edadMinima) {
+      params.ExpressionAttributeNames = { '#edad': 'edad'}
+      params.ExpressionAttributeValues = { ':edad': parseInt(queryParams.edadMinima)}
+      params.FilterExpression = "#edad >= :edad"
     }
     let clientes = await scan(params)
     return sendResponse(200, getClientesResponse(clientes), headers)
@@ -28,7 +42,6 @@ module.exports.get = async (event, context) => {
 
 const getClientesResponse = (clientes) => {
   let clientesRs = []
-  console.log(clientes)
   clientes.Items.forEach(item => {
     let idTipo = item.id.split('-')[0]
     let idNumero = item.id.split('-')[1]
